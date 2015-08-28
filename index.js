@@ -25,6 +25,8 @@ app.listen(port, function(){
 	console.log("We're live at port " + port + ".");
 });
 
+app.use("/public", express.static(__dirname + "/scripts/"));
+
 app.get("/scroll-depth", function(request, response){
 	var connection = connectMySQL("briefingtracker");
 	
@@ -32,20 +34,21 @@ app.get("/scroll-depth", function(request, response){
 	connection.query("SELECT * FROM scrollDepth WHERE instance_id = ?", 
 	[request.query.instance_id || ""], function(err, rows){
 		if( err ) throw err;
-		// Looks like this person has already looked at a tile! Does this mean they're looking at another one??
 		if( rows.length > 0 ){
-			// Feeling powerful because the user looked at more tiles than they had previously!!
 			rows = rows[0];
 			if( rows.tilesViewed < parseInt(request.query.tilesViewed) ){
+				// Feeling powerful because the user looked at more tiles than they had previously!!
 				connection.query("UPDATE scrollDepth SET tilesViewed = ? WHERE instance_id = ? ",
 				[request.query.tilesViewed, request.query.instance_id], function(err){
 					if( err ) throw err;
 					console.log("Oh HELL yeah, user " +  request.query.user_id + " just looked at " + request.query.tilesViewed + " tiles!");
 					connection.end();
+					success();
 				});
 			}
 			else {
 				connection.end();
+				success();
 			}
 		} 
 		// OK, we have a new instance of someone using the tool! Let's mark it down
@@ -55,10 +58,14 @@ app.get("/scroll-depth", function(request, response){
 				if( err ) throw err;
 				console.log("Is Kanye the most overbooked? Yessir, because we just added another instance.");
 				connection.end();
+				success();
 			});
 		}
 	});
 	
+	function success(){
+		response.status(200).json({message: "success!"});
+	}
 
 });
 
