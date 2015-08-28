@@ -4,18 +4,15 @@ var app = express();
 
 // Initialize database if it doesn't exist already
 var connection = connectMySQL();
-connection.query("CREATE DATABASE IF NOT EXISTS briefingtracker", function(err){ 
+
+connection.query("CREATE TABLE IF NOT EXISTS scrollDepth (" + 
+	"instance_id VARCHAR(50), user_id VARCHAR(50), tilesViewed INT, tilesTotal INT, timestamp DATETIME)", function(err){ 
 	if(err) throw err 
-	console.log("Created `briefingtracker` database AND LOVED IT");
-	
-	connection.query("CREATE TABLE IF NOT EXISTS briefingtracker.scrollDepth (" + 
-		"instance_id VARCHAR(50), user_id VARCHAR(50), tilesViewed INT, tilesTotal INT, timestamp DATETIME)", function(err){ 
-		if(err) throw err 
-		console.log("Created `scrollDepth` table AND LOVED IT EVEN MORE");
-		connection.end();
-	});
-	
+	console.log("Created `scrollDepth` table AND LOVED IT EVEN MORE");
+	connection.end();
 });
+	
+
 
 
 
@@ -28,7 +25,7 @@ app.listen(port, function(){
 app.use("/public", express.static(__dirname + "/scripts/"));
 
 app.get("/scroll-depth", function(request, response){
-	var connection = connectMySQL("briefingtracker");
+	var connection = connectMySQL();
 	
 	// Check to see if this instance of looking at the tool has already been recorded
 	connection.query("SELECT * FROM scrollDepth WHERE instance_id = ?", 
@@ -74,6 +71,7 @@ function connectMySQL(database){
 	// Open connection to mySQL database
 	var connection = mysql.createConnection(process.env.CLEARDB_DATABASE_URL || "mysql://root@localhost/" + database);
 	connection.on("error", function(err){  
+		console.log(err);
 		connection.end();
 		 return setTimeout(function(){ return connectMySQL() },3000);
 	});
