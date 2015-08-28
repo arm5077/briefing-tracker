@@ -55,12 +55,12 @@ app.get("/scroll-depth", function(request, response){
 					if( err ) throw err;
 					console.log("Oh HELL yeah, user " +  request.query.user_id + " just looked at " + request.query.tilesViewed + " tiles!");
 					connection.end();
-					success();
+					success(response);
 				});
 			}
 			else {
 				connection.end();
-				success();
+				success(response);
 			}
 		} 
 		// OK, we have a new instance of someone using the tool! Let's mark it down
