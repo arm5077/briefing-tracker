@@ -35,7 +35,7 @@ $(".briefing-update").waypoint(function(){
 });
 
 // Attach event to overall social button click
-$(".post-share-btn").click(function(){
+$(".briefing-update .post-share-btn").click(function(){
 	$.get("http://nj-briefing-tracker.herokuapp.com/social-click", {
 		user_id: user_id,
 		instance_id: instance_id,
@@ -48,7 +48,7 @@ $(".post-share-btn").click(function(){
 });
 
 // Attach event to facebook button click
-$(".link-facebook a").click(function(){
+$(".briefing-update .link-facebook a").click(function(){
 	$.get("http://nj-briefing-tracker.herokuapp.com/social-click", {
 		user_id: user_id,
 		instance_id: instance_id,
@@ -61,7 +61,7 @@ $(".link-facebook a").click(function(){
 });
 
 // Attach event to twitter button click
-$(".link-twitter a").click(function(){
+$(".briefing-update .link-twitter a").click(function(){
 	$.get("http://nj-briefing-tracker.herokuapp.com/social-click", {
 		user_id: user_id,
 		instance_id: instance_id,

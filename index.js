@@ -99,6 +99,12 @@ app.get("/user-visit", function(request, response){
 	});	
 });
 
+app.get("/article-button-press", function(request, response){
+
+		success(response);
+
+});
+
 function success(response){
 	response.status(200).json({message: "success!"});
 }
