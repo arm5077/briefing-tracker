@@ -54,5 +54,3 @@ $(".briefing-update .link-twitter a").click(function(){
 		console.log(data);
 	});
 });
-	
-});
