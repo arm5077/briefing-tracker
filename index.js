@@ -17,16 +17,19 @@ connection.query("CREATE TABLE IF NOT EXISTS scrollDepth (" +
 	console.log("Created `scrollDepth` table AND LOVED IT");
 
 	connection.query("CREATE TABLE IF NOT EXISTS socialClick (" + 
-		"instance_id VARCHAR(50), user_id VARCHAR(50), button VARCHAR(50), timestamp DATETIME)", function(err){ 
+		"instance_id VARCHAR(50), user_id VARCHAR(50), button VARCHAR(50), parent VARCHAR(200), timestamp DATETIME)", function(err){ 
 		if(err) throw err
 		console.log("Created `socialClick` and tell you what, it... clicked!");
+		
+		connection.query("CREATE TABLE IF NOT EXISTS userVisits (" + 
+			"instance_id VARCHAR(50), user_id VARCHAR(50), timestamp DATETIME)", function(err){
+			if(err) throw err;
+		});
+
 		connection.end();
 	});
 });
 	
-
-
-
 
 // Turn on server
 var port = process.env.PORT || 3000;
@@ -75,14 +78,25 @@ app.get("/scroll-depth", function(request, response){
 
 app.get("/social-click", function(request, response){
 	var connection = connectMySQL();
-	connection.query("INSERT INTO socialClick (instance_id, user_id, button, timestamp) VALUES(?, ?, ?, ?)",
-	[request.query.instance_id || "a", request.query.user_id || "a", request.query.button || "default", request.query.timestamp || "0000-00-00"], function(err){
+	connection.query("INSERT INTO socialClick (instance_id, user_id, button, parent, timestamp) VALUES(?, ?, ?, ?, ?)",
+	[request.query.instance_id || "a", request.query.user_id || "a", request.query.button || "default", request.query.parent || "no parent", request.query.timestamp || "0000-00-00"], function(err){
 		if( err ) throw err;
 		console.log("Interviews are like confessions, and also, a user just clicked a social button!");
 		connection.end();
 		success(response);
 	});
 
+});
+
+app.get("/user-visit", function(request, response){
+	var connection = connectMySQL();
+	connection.query("INSERT INTO userVisits (instance_id, user_id, timestamp) VALUES(?, ?, ?)",
+	[request.query.instance_id || "a", request.query.user_id || "a", request.query.timestamp || "0000-00-00"], function(err){
+		if( err ) throw err;
+		console.log("SOMEONE IS LOOKING AT THIS TOOOOOOOOL!");
+		connection.end();
+		success(response);
+	});	
 });
 
 function success(response){
