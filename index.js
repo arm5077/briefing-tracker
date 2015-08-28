@@ -2,14 +2,22 @@ var express = require("express");
 var mysql = require("mysql");
 var app = express();
 
+app.use(allowCrossDomain);
+
 // Initialize database if it doesn't exist already
 var connection = connectMySQL();
 
 connection.query("CREATE TABLE IF NOT EXISTS scrollDepth (" + 
 	"instance_id VARCHAR(50), user_id VARCHAR(50), tilesViewed INT, tilesTotal INT, timestamp DATETIME)", function(err){ 
 	if(err) throw err 
-	console.log("Created `scrollDepth` table AND LOVED IT EVEN MORE");
-	connection.end();
+	console.log("Created `scrollDepth` table AND LOVED IT");
+
+	connection.query("CREATE TABLE IF NOT EXISTS socialClick (" + 
+		"instance_id VARCHAR(50), user_id VARCHAR(50), button VARCHAR(50), timestamp DATETIME)", function(err){ 
+		if(err) throw err
+		console.log("Created `socialClick` and tell you what, it... clicked!");
+		connection.end();
+	});
 });
 	
 
@@ -55,21 +63,32 @@ app.get("/scroll-depth", function(request, response){
 				if( err ) throw err;
 				console.log("Is Kanye the most overbooked? Yessir, because we just added another instance.");
 				connection.end();
-				success();
+				success(response);
 			});
 		}
 	});
-	
-	function success(){
-		response.status(200).json({message: "success!"});
-	}
+});
+
+app.get("/social-click", function(request, response){
+	var connection = connectMySQL();
+	connection.query("INSERT INTO socialClick (instance_id, user_id, button, timestamp) VALUES(?, ?, ?, ?)",
+	[request.query.instance_id || "a", request.query.user_id || "a", request.query.button || "default", request.query.timestamp || "0000-00-00"], function(err){
+		if( err ) throw err;
+		console.log("Interviews are like confessions, and also, a user just clicked a social button!");
+		connection.end();
+		success(response);
+	});
 
 });
+
+function success(response){
+	response.status(200).json({message: "success!"});
+}
 
 function connectMySQL(database){
 	database = database || "";
 	// Open connection to mySQL database
-	var connection = mysql.createConnection(process.env.CLEARDB_DATABASE_URL || "mysql://root@localhost/" + database);
+	var connection = mysql.createConnection(process.env.CLEARDB_DATABASE_URL || "mysql://root@localhost/briefingtracker");
 	connection.on("error", function(err){  
 		console.log(err);
 		connection.end();
