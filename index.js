@@ -24,9 +24,23 @@ connection.query("CREATE TABLE IF NOT EXISTS scrollDepth (" +
 		connection.query("CREATE TABLE IF NOT EXISTS userVisits (" + 
 			"instance_id VARCHAR(50), user_id VARCHAR(50), timestamp DATETIME)", function(err){
 			if(err) throw err;
-		});
+			console.log("Created `userVisits`. I'm getting tired of writing funny jokes.");
+			
+			connection.query("CREATE TABLE IF NOT EXISTS articleButtonClicks (" +
+			"instance_id VARCHAR(50), user_id VARCHAR(50), index INT, timestamp DATETIME)", function(){
+				if(err) throw err;
+				console.log("Created `articleButtonClicks`. Why do I even bother?");				
+				
+					connection.query("CREATE TABLE IF NOT EXISTS headingClicks (" +
+					"instance_id VARCHAR(50), user_id VARCHAR(50), heading VARCHAR(200), timestamp DATETIME)", function(err){
+						if(err) throw err;
+						console.log("Created `headingClicks`. Goodbye, cruel world.");				
+						connection.end();						
+					})
+				
 
-		connection.end();
+			});
+		});
 	});
 });
 	
@@ -100,13 +114,25 @@ app.get("/user-visit", function(request, response){
 });
 
 app.get("/article-button-press", function(request, response){
-
+	var connection = connectMySQL();
+	connection.query("INSERT INTO articleButtonClicks (instance_id, user_id, index, timestamp) VALUES(?, ?, ?, ?)",
+	[request.query.instance_id || "a", request.query.user_id || "a", request.query.index || 999, request.query.timestamp || "0000-00-00"], function(err){
+		if( err ) throw err;
+		console.log("Wow. An article reader clicked a briefing button. Wowwww.");
+		connection.end();
 		success(response);
-
+	});
 });
 
 app.get("/heading-click", function(request, response){
-	success(response);
+	var connection = connectMySQL();
+	connection.query("INSERT INTO headingClicks (instance_id, user_id, heading, timestamp) VALUES(?, ?, ?, ?)",
+	[request.query.instance_id || "a", request.query.user_id || "a", request.query.heading || "undefined", request.query.timestamp || "0000-00-00"], function(err){
+		if( err ) throw err;
+		console.log("SOMEBODY is trying to filter THE BRIEFING. HOW DARE THEY?");
+		connection.end();
+		success(response);
+	});
 });
 
 function success(response){
