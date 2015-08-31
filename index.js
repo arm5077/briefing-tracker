@@ -105,6 +105,10 @@ app.get("/article-button-press", function(request, response){
 
 });
 
+app.get("/heading-click", function(request, response){
+	success(response);
+});
+
 function success(response){
 	response.status(200).json({message: "success!"});
 }
